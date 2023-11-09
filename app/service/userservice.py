@@ -38,9 +38,15 @@ class UserSchema(BaseModel):
         arbitrary_types_allowed = True
 
 #Read the environment variables
+print("Loading Environment Variables")
 load_dotenv('.env')
+print("Loaded Environment Variables")
 app = FastAPI()
 
+with open('.env') as f:
+    lines = f.readlines()
+    print(lines[0])
+    
 #Construct the DB Connection URL using environment variable
 url = URL.create( drivername=os.environ['DB_Driver'], username=os.environ['DB_Username'], password=os.environ['DB_Password'], host=os.environ['DB_Host'], database=os.environ['Database'])
 engine = create_engine(url)

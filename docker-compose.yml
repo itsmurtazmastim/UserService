@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  db:
+    build: ./database/
+  app:
+    build: ./app/
+    ports:
+     - 80:80
