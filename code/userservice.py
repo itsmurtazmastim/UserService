@@ -1,17 +1,12 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer, String, Text, exc # To handle exceptions while querying
 from sqlalchemy.engine import URL
-from sqlalchemy import Column, Integer, String, DateTime, Text
-from sqlalchemy.orm import declarative_base
-from datetime import datetime
-from fastapi import FastAPI, HTTPException, Response, status
-from pydantic import BaseModel
+from sqlalchemy.orm import declarative_base, sessionmaker
+from fastapi import FastAPI, Response, status
+from pydantic import BaseModel, parse_obj_as
 from typing import Optional, List
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import exc # To handle exceptions while querying
-from pydantic import parse_obj_as
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-import json
+import json, os
+from dotenv import load_dotenv
+
 # URL to run -> http://localhost:8000/docs which opens the Swagger API documentation
 # Run Uvicorn - uvicorn main:app --reload
 
@@ -42,10 +37,12 @@ class UserSchema(BaseModel):
         orm_mode = True
         arbitrary_types_allowed = True
 
+#Read the environment variables
+load_dotenv('.env')
 app = FastAPI()
 
- #Todo read from ini file
-url = URL.create( drivername="postgresql", username="postgres", password="postgres", host="localhost", database="postgres")
+#Construct the DB Connection URL using environment variable
+url = URL.create( drivername=os.environ['DB_Driver'], username=os.environ['DB_Username'], password=os.environ['DB_Password'], host=os.environ['DB_Host'], database=os.environ['Database'])
 engine = create_engine(url)
 print("Connecting to database")
 connection = engine.connect()
