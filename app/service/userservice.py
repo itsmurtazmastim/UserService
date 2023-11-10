@@ -7,8 +7,9 @@ from typing import Optional, List
 import json, os
 from dotenv import load_dotenv
 
-# URL to run -> http://localhost:8000/docs which opens the Swagger API documentation
-# Run Uvicorn - uvicorn main:app --reload
+# To run use the below command from the same directory which has userservice.py
+# uvicorn userservice:app --port 8080 --reload 
+# The Swagger API documentation is hosted at http://localhost:8080/docs 
 
 Base = declarative_base()
 class User(Base):
@@ -40,12 +41,7 @@ class UserSchema(BaseModel):
 #Read the environment variables
 print("Loading Environment Variables")
 load_dotenv('.env')
-print("Loaded Environment Variables")
 app = FastAPI()
-
-with open('.env') as f:
-    lines = f.readlines()
-    print(lines[0])
     
 #Construct the DB Connection URL using environment variable
 url = URL.create( drivername=os.environ['DB_Driver'], username=os.environ['DB_Username'], password=os.environ['DB_Password'], host=os.environ['DB_Host'], database=os.environ['Database'])
@@ -62,9 +58,9 @@ session = Session()
 @app.get('/users')
 def getAllUsers(response: Response):
     users = session.query(User).all()
-    print(len(users))
+  
     if len(users) == 0: #No users exists return appropraite HTTPS response
-        response.status_code = status.HTTP_200_OK #Todo test after delete
+        response.status_code = status.HTTP_200_OK
         retString = "No users exists in the user database"
         json_string = '{"message": "' + retString + '"}'
         return json.loads(json_string)
@@ -77,7 +73,7 @@ def getAllUsers(response: Response):
 def get_user(u_id: int, response: Response):
     users = session.query(User).filter(User.id == u_id).all()
     if len(users) == 0:
-        response.status_code = status.HTTP_404_NOT_FOUND #Todo test after delete
+        response.status_code = status.HTTP_404_NOT_FOUND
         retString = "User with id " + str(u_id) + " does not exists in user database"
         json_string = '{"message": "' + retString + '"}'
         return json.loads(json_string)
@@ -104,7 +100,7 @@ def delete_user(u_id: int):
         print('Exception occurred while deleting')
 
 @app.put('/users/{u_id}', status_code=202)
-def update_user(u_id: int, userObj: UserSchema):
+def update_user(u_id: int, userObj: UserSchema, response: Response):
     users = session.query(User).filter(User.id == u_id).all()
     if len(users) == 0:
         response.status_code = status.HTTP_404_NOT_FOUND
