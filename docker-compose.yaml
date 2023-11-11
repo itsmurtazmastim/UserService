@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  app:
+    build: ./app/
+    ports:
+      - 8080:8080
+    networks:
+      - course_reg_nw
+    depends_on:
+      - db
+
+  db:
+    build: ./database/
+    networks:
+      - course_reg_nw
+
+networks:
+  course_reg_nw:
+    driver: bridge
