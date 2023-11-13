@@ -1,15 +1,18 @@
 version: "3.8"
 services:
-  app:
-    build: ./app/
-    ports:
-     - 8080:8080
-    networks:
-        - course_reg_nw
   db:
     build: ./database/
     networks:
         - course_reg_nw
+  user-service:
+    build: ./app/
+    ports:
+        - "8080:8080"
+    networks:
+        - course_reg_nw
+    depends_on:
+        - db
 networks:
    course_reg_nw:
-      driver: bridge
+    name: course_reg_nw
+    external: true

@@ -97,6 +97,7 @@ def delete_user(u_id: int):
             json_string = '{"message": "' + retString + '"}'
             return json.loads(json_string)
     except:
+        session.rollback()
         print('Exception occurred while deleting')
 
 @app.put('/users/{u_id}', status_code=202)
@@ -117,10 +118,15 @@ def update_user(u_id: int, userObj: UserSchema, response: Response):
         gender=userObj.gender,
         age=userObj.age
         )
-        session.query(User).filter(User.id == u_id).update({User.email:new_user.email, 
-        User.name:new_user.name, User.address:new_user.address, User.mobile:new_user.mobile, User.gender:new_user.gender, User.age:new_user.age})
-        session.commit()
-        return UserSchema.from_orm(new_user)
+        try:
+            session.query(User).filter(User.id == u_id).update({User.email:new_user.email, 
+            User.name:new_user.name, User.address:new_user.address, User.mobile:new_user.mobile, User.gender:new_user.gender, User.age:new_user.age})
+            session.commit()
+            return UserSchema.from_orm(new_user)
+        except Exception:
+            session.rollback()
+            print("Exception Occured")
+            return "Unable to add duplicate values"
 
 @app.post('/users', status_code=201)
 def new_user(userObj: UserSchema):
@@ -150,6 +156,7 @@ def new_user(userObj: UserSchema):
         return UserSchema.from_orm(new_user)
     
     except exc.IntegrityError:
+        session.rollback()
         print("Exception Occured")
         return "Unable to add duplicate values"
 
