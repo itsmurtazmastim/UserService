@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
       - name: app
-        image: itsmurtaz/scalable_service_assignment:userservice-app
+        image: vanidevilekkala/scalable-services:userservice-app-v1 
         ports:
-        - containerPort: 80  # Replace with the port your app service is listening on
+        - containerPort: 8080  # Replace with the port your app service is listening on
 
 ---
 apiVersion: v1
@@ -28,6 +28,6 @@ spec:
     app: app
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 8080
+      targetPort: 8080
   type: NodePort

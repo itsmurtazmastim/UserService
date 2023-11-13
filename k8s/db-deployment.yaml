@@ -6,25 +6,39 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: db
+      app: dbapp
   template:
     metadata:
       labels:
-        app: db
+        app: dbapp
     spec:
       containers:
-      - name: db
-        image: itsmurtaz/scalable_service_assignment:userservice-db
+      - name: dbapp
+        image: vanidevilekkala/scalable-services:userservice-db-v1
+          # itsmurtaz/scalable_service_assignment:userservice-db
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: db-service
+  name: db
 spec:
   selector:
-    app: db
+    app: dbapp
   ports:
     - protocol: TCP
       port: 5432
       targetPort: 5432
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: default
+  labels:
+    app: dbapp
+data:
+  POSTGRES_DB: userservice
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
